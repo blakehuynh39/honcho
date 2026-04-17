@@ -248,8 +248,9 @@ class DeriverSettings(BackupLLMSettingsMixin, HonchoSettings):
         int, Field(default=30 * 24 * 3600, gt=0)
     ] = 30 * 24 * 3600  # 30 days default
 
-    PROVIDER: SupportedProviders = "google"
-    MODEL: str = "gemini-2.5-flash-lite"
+    PROVIDER: SupportedProviders = "openai"
+    MODEL: str = "gpt-5.4"
+    REASONING_EFFORT: Literal["minimal", "low", "medium", "high", "xhigh"] | None = "xhigh"
     TEMPERATURE: float | None = None
 
     # Whether to deduplicate documents when creating them
@@ -309,6 +310,10 @@ class DialecticLevelSettings(BaseModel):
 
     PROVIDER: Annotated[SupportedProviders, Field(validation_alias="provider")]
     MODEL: Annotated[str, Field(validation_alias="model")]
+    REASONING_EFFORT: Annotated[
+        Literal["minimal", "low", "medium", "high", "xhigh"] | None,
+        Field(default="xhigh", validation_alias="reasoning_effort"),
+    ] = "xhigh"
     BACKUP_PROVIDER: Annotated[
         SupportedProviders | None, Field(validation_alias="backup_provider")
     ] = None
@@ -359,35 +364,40 @@ class DialecticSettings(HonchoSettings):
     LEVELS: dict[ReasoningLevel, DialecticLevelSettings] = Field(
         default_factory=lambda: {
             "minimal": DialecticLevelSettings(
-                PROVIDER="google",
-                MODEL="gemini-2.5-flash-lite",
+                PROVIDER="openai",
+                MODEL="gpt-5.4",
+                REASONING_EFFORT="xhigh",
                 THINKING_BUDGET_TOKENS=0,
                 MAX_TOOL_ITERATIONS=1,
                 MAX_OUTPUT_TOKENS=250,
                 TOOL_CHOICE="any",
             ),
             "low": DialecticLevelSettings(
-                PROVIDER="google",
-                MODEL="gemini-2.5-flash-lite",
+                PROVIDER="openai",
+                MODEL="gpt-5.4",
+                REASONING_EFFORT="xhigh",
                 THINKING_BUDGET_TOKENS=0,
                 MAX_TOOL_ITERATIONS=5,
                 TOOL_CHOICE="any",
             ),
             "medium": DialecticLevelSettings(
-                PROVIDER="anthropic",
-                MODEL="claude-haiku-4-5",
+                PROVIDER="openai",
+                MODEL="gpt-5.4",
+                REASONING_EFFORT="xhigh",
                 THINKING_BUDGET_TOKENS=1024,
                 MAX_TOOL_ITERATIONS=2,
             ),
             "high": DialecticLevelSettings(
-                PROVIDER="anthropic",
-                MODEL="claude-haiku-4-5",
+                PROVIDER="openai",
+                MODEL="gpt-5.4",
+                REASONING_EFFORT="xhigh",
                 THINKING_BUDGET_TOKENS=1024,
                 MAX_TOOL_ITERATIONS=4,
             ),
             "max": DialecticLevelSettings(
-                PROVIDER="anthropic",
-                MODEL="claude-haiku-4-5",
+                PROVIDER="openai",
+                MODEL="gpt-5.4",
+                REASONING_EFFORT="xhigh",
                 THINKING_BUDGET_TOKENS=2048,
                 MAX_TOOL_ITERATIONS=10,
             ),
@@ -433,8 +443,9 @@ class SummarySettings(BackupLLMSettingsMixin, HonchoSettings):
     MESSAGES_PER_SHORT_SUMMARY: Annotated[int, Field(default=20, gt=0, le=100)] = 20
     MESSAGES_PER_LONG_SUMMARY: Annotated[int, Field(default=60, gt=0, le=500)] = 60
 
-    PROVIDER: SupportedProviders = "google"
-    MODEL: str = "gemini-2.5-flash"
+    PROVIDER: SupportedProviders = "openai"
+    MODEL: str = "gpt-5.4"
+    REASONING_EFFORT: Literal["minimal", "low", "medium", "high", "xhigh"] | None = "xhigh"
     MAX_TOKENS_SHORT: Annotated[int, Field(default=1000, gt=0, le=10_000)] = 1000
     MAX_TOKENS_LONG: Annotated[int, Field(default=4000, gt=0, le=20_000)] = 4000
 

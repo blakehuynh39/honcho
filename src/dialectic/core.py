@@ -416,6 +416,7 @@ class DialecticAgent:
             track_name="Dialectic Agent",
             thinking_budget_tokens=level_settings.THINKING_BUDGET_TOKENS,
             max_input_tokens=settings.DIALECTIC.MAX_INPUT_TOKENS,
+            reasoning_effort=level_settings.REASONING_EFFORT,
             trace_name="dialectic_chat",
         )
 

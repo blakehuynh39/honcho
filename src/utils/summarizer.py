@@ -215,6 +215,7 @@ async def create_short_summary(
         llm_settings=settings.SUMMARY,
         prompt=prompt,
         max_tokens=settings.SUMMARY.MAX_TOKENS_SHORT,
+        reasoning_effort=settings.SUMMARY.REASONING_EFFORT,
     )
 
 
@@ -240,6 +241,7 @@ async def create_long_summary(
         llm_settings=settings.SUMMARY,
         prompt=prompt,
         max_tokens=settings.SUMMARY.MAX_TOKENS_LONG,
+        reasoning_effort=settings.SUMMARY.REASONING_EFFORT,
     )
 
 
