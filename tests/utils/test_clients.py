@@ -31,6 +31,7 @@ from src.utils.clients import (
     CLIENTS,
     HonchoLLMCallResponse,
     HonchoLLMCallStreamChunk,
+    _convert_openai_messages_to_responses_input,
     handle_streaming_response,
     honcho_llm_call,
     honcho_llm_call_inner,
@@ -422,6 +423,46 @@ class TestOpenAIClient:
                     "input": {"repo": "rsi-agent-platform"},
                 }
             ]
+
+    def test_openai_responses_replay_omits_invalid_call_style_ids(self):
+        """Responses replay should preserve call_id but not invent invalid item ids."""
+        items = _convert_openai_messages_to_responses_input(
+            [
+                {
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [
+                        {
+                            "id": "call_123",
+                            "type": "function",
+                            "function": {
+                                "name": "repo_context",
+                                "arguments": '{"repo":"rsi-agent-platform"}',
+                            },
+                        }
+                    ],
+                },
+                {
+                    "role": "tool",
+                    "tool_call_id": "call_123",
+                    "content": "tool result",
+                },
+            ]
+        )
+
+        assert items == [
+            {
+                "type": "function_call",
+                "call_id": "call_123",
+                "name": "repo_context",
+                "arguments": '{"repo":"rsi-agent-platform"}',
+            },
+            {
+                "type": "function_call_output",
+                "call_id": "call_123",
+                "output": "tool result",
+            },
+        ]
 
     async def test_openai_json_mode(self):
         """Test OpenAI with JSON mode"""
