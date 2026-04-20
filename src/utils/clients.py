@@ -417,7 +417,6 @@ def _convert_openai_messages_to_responses_input(
                     "type": "function_call_output",
                     "call_id": str(msg.get("tool_call_id", "") or "").strip(),
                     "output": _openai_message_content_to_string(msg.get("content")),
-                    "id": str(msg.get("tool_call_id", "") or "").strip(),
                 }
             )
             continue
@@ -443,7 +442,6 @@ def _convert_openai_messages_to_responses_input(
                     {
                         "type": "function_call",
                         "call_id": call_id,
-                        "id": call_id,
                         "name": name,
                         "arguments": str(arguments),
                     }
