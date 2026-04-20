@@ -196,10 +196,46 @@ app.include_router(webhooks.router, prefix="/v3")
 app.add_route("/metrics", metrics_endpoint, methods=["GET"])
 
 
+def honcho_runtime_payload() -> dict[str, object]:
+    return {
+        "namespace": settings.NAMESPACE,
+        "db_schema": settings.DB.SCHEMA,
+        "cache_enabled": settings.CACHE.ENABLED,
+        "cache_url_configured": bool(settings.CACHE.URL),
+        "deriver": {
+            "provider": settings.DERIVER.MODEL_CONFIG.transport,
+            "model": settings.DERIVER.MODEL_CONFIG.model,
+            "reasoning_effort": settings.DERIVER.MODEL_CONFIG.reasoning_effort,
+        },
+        "summary": {
+            "provider": settings.SUMMARY.MODEL_CONFIG.transport,
+            "model": settings.SUMMARY.MODEL_CONFIG.model,
+            "reasoning_effort": settings.SUMMARY.MODEL_CONFIG.reasoning_effort,
+        },
+        "dialectic_levels": {
+            level: {
+                "provider": level_settings.MODEL_CONFIG.transport,
+                "model": level_settings.MODEL_CONFIG.model,
+                "reasoning_effort": level_settings.MODEL_CONFIG.reasoning_effort,
+                "thinking_budget_tokens": level_settings.MODEL_CONFIG.thinking_budget_tokens
+                or 0,
+            }
+            for level, level_settings in settings.DIALECTIC.LEVELS.items()
+        },
+    }
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint for monitoring and container orchestration."""
     return {"status": "ok"}
+
+
+@app.get("/runtimez")
+async def runtime_status():
+    payload = honcho_runtime_payload()
+    payload["status"] = "ok"
+    return payload
 
 
 # Global exception handlers
