@@ -309,7 +309,7 @@ class OpenAIBackend:
         if tools:
             params["tools"] = self._convert_tools(tools)
             if tool_choice is not None:
-                params["tool_choice"] = tool_choice
+                params["tool_choice"] = self._convert_tool_choice(tool_choice)
         if extra_params:
             for key in (
                 "top_p",
@@ -320,6 +320,13 @@ class OpenAIBackend:
                 if key in extra_params:
                     params[key] = extra_params[key]
         return params
+
+    def _convert_tool_choice(
+        self, tool_choice: str | dict[str, Any]
+    ) -> str | dict[str, Any]:
+        if tool_choice == "any":
+            return "required"
+        return tool_choice
 
     def _normalize_response(
         self,
